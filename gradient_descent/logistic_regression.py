@@ -10,32 +10,48 @@ class Logistic_regression:
     self.d = size(X,1) 
     self.n = size(X,0)
   
-  def compute_Z(W):
-    Z = zeros(n)
+  def compute_Z(self,W):
+    Z = zeros(self.n)
     
-    for i in xrange (0, n):
-      for j in xrange (0, k):
+    for i in xrange (0, self.n):
+      for j in xrange (0, self.k):
         Z[i] += exp( dot(W[j],X[i]) )
   
     return Z
+
+  def compute_P(self, W):
+      Z = self.compute_Z(W)
+      P = zeros((self.n,self.k))
+      for i in xrange(0, self.n):
+        for j in xrange(0, self.k):
+          P[i][j] = exp(dot(W[j],X[i])) / Z[i]
+
+      return P
   
   def evaluate(self, W):
   
-    log_Z = log(compute_Z(W))
+    log_Z = log(self.compute_Z(W))
     
     ans = 0
-    for i in xrange(0, n):
-      for j in xrange(0, k):
+    for i in xrange(0, self.n):
+      for j in xrange(0, self.k):
         ans += dot(W[j],X[i]) - log_Z[i]
       
     return -ans
     
     
   def gradient(self, W):
-    
-    P = compute_P(W)
-    D = self.Y - P
-    
+    '''P = self.compute_P(W)
+    D = P - Y
+    ans = zeros((self.k,self.d))
+    for a in xrange(0, self.k):
+      for b in xrange(0, self.d):
+        for i in xrange(0, self.n):
+          ans[a][b] += X[i][b]*D[i][a]
+
+    return ans'''
+    P = self.compute_P(W)
+    D = Y - P
     return dot(D.T,X)
     
     
@@ -44,13 +60,20 @@ class Logistic_regression:
 
 
 if __name__ == "__main__": 
-
-  x = Logistic_regression()
+  (X_1,Y) = load('test_lreg.npy')
+  X =  ones((100,1))
+  X = hstack((X_1,X))
+  lr = Logistic_regression(X,Y)
   
   g = GradientDescUpdate(100, 0.5)
-  l_error = g.find_local_minimum(x)
+  l_error = g.find_local_minimum(lr)
   print g.actual_pos
   print l_error[-1]
-  plt.plot(range(len(l_error)),l_error)
+  #plt.plot(range(len(l_error)),l_error)
+  plt.plot(X[:,0],X[:,1],'rx')
+  x = linspace(-5,5,200)
+  y = (-X[0][0]*x - X[1][0]) / X[2][0]
+  plt.plot(x,y)
+  plt.hold()
   plt.show()
 
