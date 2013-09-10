@@ -39,8 +39,7 @@ class GradientDescent:
     
 class GradientDescUpdate:
   "Class to find a local minimum of a function using gradient descent"
-  
-  
+    
   def __init__(self,num_iter, step, eps=1e-5):
     self.num_iter = num_iter
     self.step = step
