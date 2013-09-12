@@ -41,7 +41,8 @@ class Logistic_regression:
     
     
   def gradient(self, W):
-    '''P = self.compute_P(W)
+    '''
+    P = self.compute_P(W)
     D = P - Y
     ans = zeros((self.k,self.d))
     for a in xrange(0, self.k):
@@ -49,10 +50,12 @@ class Logistic_regression:
         for i in xrange(0, self.n):
           ans[a][b] += X[i][b]*D[i][a]
 
-    return ans'''
+    return ans
+    '''
     P = self.compute_P(W)
-    D = Y - P
+    D = P - Y
     return dot(D.T,X)
+    
     
     
   def get_random_pos(self):
@@ -60,20 +63,27 @@ class Logistic_regression:
 
 
 if __name__ == "__main__": 
-  (X_1,Y) = load('test_lreg.npy')
-  X =  ones((100,1))
+  (X_1,Y) = load('datos.npy')
+  #print Y
+  n = size(X_1,0)
+  X =  ones((n,1))
   X = hstack((X_1,X))
+  #print X,Y
   lr = Logistic_regression(X,Y)
   
-  g = GradientDescUpdate(100, 0.5)
+  g = GradientDescUpdate(50, 0.1)
   l_error = g.find_local_minimum(lr)
   print g.actual_pos
   print l_error[-1]
   #plt.plot(range(len(l_error)),l_error)
-  plt.plot(X[:,0],X[:,1],'rx')
+  #plt.show()
+  plt.plot(X[0:n/2,0],X[0:n/2,1],'rx')
+  plt.plot(X[n/2:n,0],X[n/2:n,1],'bx')
   x = linspace(-5,5,200)
-  y = (-X[0][0]*x - X[1][0]) / X[2][0]
+  w = g.actual_pos[0,:]
+  print w
+  y = (-w[0]*x - w[2]) / w[1]
   plt.plot(x,y)
-  plt.hold()
+  #plt.hold()
   plt.show()
 
