@@ -3,12 +3,13 @@
 from gradient_descent import *
 import matplotlib.pyplot as plt
 
-class Logistic_regression:
+class MAPLogReg:
   
   def __init__(self, X, Y):
     self.k = size(Y,1)
     self.d = size(X,1) 
     self.n = size(X,0)
+    self.psigma = 10 #Prior standard deviatiom
   
   def compute_Z(self,W):
     Z = zeros(self.n)
@@ -28,35 +29,22 @@ class Logistic_regression:
 
       return P
   
-  def evaluate(self, W):
-  
-    log_Z = log(self.compute_Z(W))
-    
+  def log_likehd(self, W):  
+    log_Z = log(self.compute_Z(W))    
     ans = 0
     for i in xrange(0, self.n):
       for j in xrange(0, self.k):
         ans += dot(W[j],X[i]) - log_Z[i]
-      
     return -ans
-    
+
+  def evaluate(self, W):
+      logprior = sum(sum(W**2))/(2*self.psigma**2)
+      return self.log_likehd(W) + logprior #return log posterior
     
   def gradient(self, W):
-    '''
     P = self.compute_P(W)
     D = P - Y
-    ans = zeros((self.k,self.d))
-    for a in xrange(0, self.k):
-      for b in xrange(0, self.d):
-        for i in xrange(0, self.n):
-          ans[a][b] += X[i][b]*D[i][a]
-
-    return ans
-    '''
-    P = self.compute_P(W)
-    D = P - Y
-    return dot(D.T,X)
-    
-    
+    return dot(D.T,X) + W/(self.psigma**2)
     
   def get_random_pos(self):
     return zeros( (self.k, self.d) )
@@ -69,9 +57,10 @@ if __name__ == "__main__":
   X =  ones((n,1))
   X = hstack((X_1,X))
   #print X,Y
-  lr = Logistic_regression(X,Y)
+  lr = MAPLogReg(X,Y)
+  lr.psigma=2
   
-  g = GradientDescUpdate(200, 0.1)
+  g = GradientDescUpdate(150, 0.1)
   l_error = g.find_local_minimum(lr)
   print g.actual_pos
   print l_error[-1]
